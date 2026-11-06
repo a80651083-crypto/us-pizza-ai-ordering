@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum OrderType {
+  DELIVERY
+  PICKUP
+}
+enum PaymentMethod {
+  CASH
+  CARD_DEMO
+}
+enum DiscountType {
+  PERCENT
+  FIXED
+}
+enum ChatRole {
+  USER
+  ASSISTANT
+}
+enum OrderStatus {
+  RECEIVED
+  PREPARING
+  BAKING
+  OUT_FOR_DELIVERY
+  READY_FOR_PICKUP
+  DELIVERED
+  CANCELLED
+}
+
+model Category {
+  id        Int        @id @default(autoincrement())
+  name      String
+  slug      String     @unique
+  sortOrder Int        @default(0)
+  items     MenuItem[]
+}
+
+model MenuItem {
+  id           Int              @id @default(autoincrement())
+  categoryId   Int
+  category     Category         @relation(fields: [categoryId], references: [id])
+  name         String
+  slug         String           @unique
+  description  String
+  basePriceSen Int
+  imageUrl     String?
+  isVegetarian Boolean          @default(false)
+  spicyLevel   Int              @default(0) // 0-3
+  calories     Int?
+  tags         String[]         // ["bestseller", "new"]
+  isAvailable  Boolean          @default(true)
+  options      MenuItemOption[]
+  orderItems   OrderItem[]
+}
+
+model MenuItemOption {
+  id            Int      @id @default(autoincrement())
+  menuItemId    Int
+  menuItem      MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  groupName     String   // "Size" | "Crust"
+  name          String   // "Large"
+  priceDeltaSen Int      @default(0)
+  isDefault     Boolean  @default(false)
+  sortOrder     Int      @default(0)
+}
+
+model Outlet {
+  id               Int     @id @default(autoincrement())
+  name             String
+  address          String
+  city             String
+  phone            String
+  openTime         String  // "10:00" (MYT)
+  closeTime        String  // "22:00"
+  deliveryRadiusKm Float   @default(8)
+  isActive         Boolean @default(true)
+  orders           Order[]
+}
+
+model Promotion {
+  id            Int          @id @default(autoincrement())
+  code          String       @unique
+  title         String
+  description   String
+  discountType  DiscountType
+  discountValue Int          // percent, or sen if FIXED
+  minSpendSen   Int          @default(0)
+  validFrom     DateTime
+  validTo       DateTime
+  isActive      Boolean      @default(true)
+  orders        Order[]
+}
+
+model Faq {
+  id       Int    @id @default(autoincrement())
+  topic    String // delivery | payment | allergens | hours | general
+  question String
+  answer   String
+}
+
+model GuestSession {
+  id           String        @id @default(uuid())
+  createdAt    DateTime      @default(now())
+  orders       Order[]
+  chatMessages ChatMessage[]
+}
+
+model Order {
+  id              Int           @id @default(autoincrement())
+  orderNo         String        @unique // "USP-10234"
+  sessionId       String
+  session         GuestSession  @relation(fields: [sessionId], references: [id])
+  customerName    String
+  phone           String
+  orderType       OrderType
+  outletId        Int
+  outlet          Outlet        @relation(fields: [outletId], references: [id])
+  deliveryAddress String?
+  promotionId     Int?
+  promotion       Promotion?    @relation(fields: [promotionId], references: [id])
+  subtotalSen     Int
+  discountSen     Int           @default(0)
+  deliveryFeeSen  Int           @default(0)
+  taxSen          Int
+  totalSen        Int
+  paymentMethod   PaymentMethod
+  status          OrderStatus   @default(RECEIVED)
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  items           OrderItem[]
+
+  @@index([sessionId, createdAt])
+}
+
+model OrderItem {
+  id              Int      @id @default(autoincrement())
+  orderId         Int
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId      Int
+  menuItem        MenuItem @relation(fields: [menuItemId], references: [id])
+  nameSnapshot    String
+  unitPriceSen    Int      // base + option deltas at order time
+  quantity        Int
+  selectedOptions Json     // [{"group":"Size","name":"Large","priceDeltaSen":800}]
+  lineTotalSen    Int
+}
+
+model ChatMessage {
+  id        Int          @id @default(autoincrement())
+  sessionId String
+  session   GuestSession @relation(fields: [sessionId], references: [id])
+  role      ChatRole
+  content   String
+  toolName  String?
+  createdAt DateTime     @default(now())
+
+  @@index([sessionId, createdAt])
+}

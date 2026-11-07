@@ -2,7 +2,7 @@
 
 A pizza ordering website with dummy data and a built-in AI chatbot that answers menu, order and general questions, and can add items to the cart.
 
-Demo video: `<VIDEO_LINK>`
+Demo video: https://youtu.be/dNIHm6eIu4g
 
 ## Live demo
 

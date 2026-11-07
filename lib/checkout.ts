@@ -11,6 +11,12 @@ const phone = z
     error: "Enter a Malaysian phone number, e.g. 012-345 6789",
   });
 
+export const cartLineSchema = z.object({
+  menuItemId: z.number().int().positive(),
+  optionIds: z.array(z.number().int().positive()).max(10),
+  quantity: z.number().int().min(1).max(MAX_QUANTITY),
+});
+
 const base = {
   customerName: z.string().trim().min(2, "Enter your name").max(80, "Name is too long"),
   phone,
@@ -18,13 +24,7 @@ const base = {
   promoCode: z.string().trim().toUpperCase().max(30).optional(),
   paymentMethod: z.enum(["CASH", "CARD_DEMO"], { error: "Choose a payment method" }),
   lines: z
-    .array(
-      z.object({
-        menuItemId: z.number().int().positive(),
-        optionIds: z.array(z.number().int().positive()).max(10),
-        quantity: z.number().int().min(1).max(MAX_QUANTITY),
-      }),
-    )
+    .array(cartLineSchema)
     .min(1, "Your cart is empty")
     .max(50, "Your cart has too many items"),
 };

@@ -18,7 +18,7 @@ export class CheckoutError extends Error {
 }
 
 /** Builds order lines from database prices. Only ids and quantities come from the browser. */
-async function priceLines(lines: CheckoutData["lines"]) {
+export async function priceLines(lines: CheckoutData["lines"]) {
   const items = await prisma.menuItem.findMany({
     where: { id: { in: lines.map((line) => line.menuItemId) }, isAvailable: true },
     include: { options: true },

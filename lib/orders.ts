@@ -127,6 +127,16 @@ export async function getMyOrder(orderNo: string, sessionId: string | undefined)
   return order && advanceStatus(order);
 }
 
+/** For orders outside this session: the phone digits prove the caller knows the customer. */
+export async function lookupOrderByPhone(orderNo: string, phoneLast4: string) {
+  if (!/^\d{4}$/.test(phoneLast4.trim())) return null;
+  const order = await prisma.order.findUnique({
+    where: { orderNo: orderNo.trim().toUpperCase() },
+  });
+  if (!order?.phone.endsWith(phoneLast4.trim())) return null;
+  return advanceStatus(order);
+}
+
 export async function getMyOrders(sessionId: string | undefined, limit = 20) {
   if (!sessionId) return [];
   const orders = await prisma.order.findMany({

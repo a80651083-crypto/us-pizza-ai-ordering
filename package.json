@@ -10,7 +10,10 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@ai-sdk/google": "^4.0.113",
+    "@ai-sdk/react": "^4.0.168",
     "@prisma/client": "^6.19.3",
+    "ai": "^7.0.164",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.5.2",
     "lucide-react": "^1.70.0",

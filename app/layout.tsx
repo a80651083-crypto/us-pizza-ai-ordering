@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ChatWidget } from "@/components/chat-widget";
 import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <footer className="border-t px-4 py-6 text-center text-sm text-muted-foreground">
           Demo site with dummy data. No real orders or payments.
         </footer>
+        <ChatWidget />
       </body>
     </html>
   );

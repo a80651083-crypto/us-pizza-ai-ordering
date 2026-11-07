@@ -2,7 +2,7 @@
 
 import { Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { MAX_QUANTITY } from "@/lib/cart-store";
+import { MAX_QUANTITY } from "@/lib/pricing";
 
 export function QuantityStepper({
   value,

@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect } from "react";
 import { ShoppingCart, Trash2 } from "lucide-react";
 import { QuantityStepper } from "@/components/quantity-stepper";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -92,6 +94,13 @@ export function CartButton() {
             <span>Subtotal</span>
             <span className="tabular-nums">{formatRM(subtotalSen)}</span>
           </div>
+          {lines.length > 0 && (
+            <SheetClose asChild>
+              <Button asChild size="lg">
+                <Link href="/checkout">Checkout</Link>
+              </Button>
+            </SheetClose>
+          )}
         </SheetFooter>
       </SheetContent>
     </Sheet>

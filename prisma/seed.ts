@@ -1,9 +1,11 @@
+import { randomUUID } from "node:crypto";
 import { OrderStatus, OrderType, PaymentMethod, PrismaClient } from "@prisma/client";
 import { computeTotals } from "../lib/pricing";
 
 const prisma = new PrismaClient();
 
-const SEED_SESSION_ID = "00000000-0000-4000-8000-000000000001";
+// Random, so nobody can read the sample orders by setting this as their cookie.
+const SEED_SESSION_ID = randomUUID();
 const MINUTE = 60_000;
 
 const RM = (ringgit: number) => Math.round(ringgit * 100);

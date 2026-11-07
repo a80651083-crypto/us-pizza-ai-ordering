@@ -1,6 +1,20 @@
 export const DELIVERY_FEE_SEN = 500;
 export const FREE_DELIVERY_MIN_SEN = 6000;
 export const SST_PERCENT = 6;
+export const MAX_QUANTITY = 20;
+
+export type DiscountRule = {
+  discountType: "PERCENT" | "FIXED";
+  discountValue: number; // percent, or sen if FIXED
+};
+
+export function calcDiscountSen(rule: DiscountRule, subtotalSen: number) {
+  const discountSen =
+    rule.discountType === "PERCENT"
+      ? Math.round((subtotalSen * rule.discountValue) / 100)
+      : rule.discountValue;
+  return Math.min(discountSen, subtotalSen);
+}
 
 /**
  * The one place order totals are worked out. All amounts are integer sen.
